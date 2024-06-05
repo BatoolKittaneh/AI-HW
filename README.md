@@ -15,15 +15,21 @@ adhering to truck capacity constraints.
 ## Methodology:
 You need to develop a tool to solve the VRP.
 1. Problem Definition
+   
 • Delivery Points: Define a set of delivery locations with demands (capacity).
+
 • Trucks: Use a fixed number of trucks, each with an equal capacity.
-• Depot: Central starting point 
-• Cooling Schedule: Define a cooling schedule for the simulated annealing 
-algorithm.
-2. Algorithm Design
+
+• Depot: Central starting point.
+
+• Cooling Schedule: Define a cooling schedule for the simulated annealing algorithm.
+
+3. Algorithm Design
+
 • Initial Solution: Generate a simple, feasible set of routes randomly.
-• Assign delivery tasks to the minimum number of trucks, considering capacity 
-constraints.
+
+• Assign delivery tasks to the minimum number of trucks, considering capacity constraints.
+
 • Objective Function: Calculate the total travel distance for the routes.
-• Neighborhoods Search: Create neighbouring solutions by swapping delivery 
-points between routes.
+
+• Neighborhoods Search: Create neighbouring solutions by swapping delivery points between routes.
