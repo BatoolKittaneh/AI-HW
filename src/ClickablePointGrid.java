@@ -178,8 +178,68 @@ public class ClickablePointGrid extends JFrame {
     }
 
     private void optimizePath() {
-        // Your optimization logic here
+        if (points.size() < 2) {
+            System.out.println("Not enough points to optimize the path.");
+            return;
+        }
+
+        boolean[] visited = new boolean[points.size()];
+        Point currentPoint = points.get(0);
+        visited[0] = true;
+        ArrayList<Point> path = new ArrayList<>();
+        path.add(currentPoint);
+
+        double totalDistance = 0;
+
+        for (int i = 1; i < points.size(); i++) {
+            double shortestDistance = Double.MAX_VALUE;
+            Point nextPoint = null;
+            int nextIndex = -1;
+
+            // Find the closest unvisited point
+            for (int j = 0; j < points.size(); j++) {
+                if (!visited[j]) {
+                    double distance = calculateDistance(currentPoint, points.get(j));
+                    if (distance < shortestDistance) {
+                        shortestDistance = distance;
+                        nextPoint = points.get(j);
+                        nextIndex = j;
+                    }
+                }
+            }
+
+            // Update the current point to the closest unvisited point
+            if (nextPoint != null) {
+                visited[nextIndex] = true;
+                path.add(nextPoint);
+                currentPoint = nextPoint;
+                totalDistance += shortestDistance;
+            }
+        }
+
+        // Draw the path in green
+        drawOptimizedPath(path);
+
+        // Print the total distance
+        System.out.println("Total shortest distance: " + totalDistance);
     }
+
+    private void drawOptimizedPath(ArrayList<Point> path) {
+        Graphics g = gridPanel.getGraphics();
+        g.setColor(Color.GREEN);
+
+        Point prevPoint = path.get(0);
+        for (int i = 1; i < path.size(); i++) {
+            Point currentPoint = path.get(i);
+            g.drawLine(prevPoint.x + 5, prevPoint.y + 5, currentPoint.x + 5, currentPoint.y + 5);
+            prevPoint = currentPoint;
+        }
+    }
+
+    private double calculateDistance(Point p1, Point p2) {
+        return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+    }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(ClickablePointGrid::new);
