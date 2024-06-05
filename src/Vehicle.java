@@ -11,4 +11,11 @@ public class Vehicle {
   public  void addPoint(Point p){
       this.Points.add(p);
   }
+    public int getWeight() {
+        int weight = 0;
+        for (Point p : Points) {
+            weight += p.weight;
+        }
+        return weight;
+    }
 }

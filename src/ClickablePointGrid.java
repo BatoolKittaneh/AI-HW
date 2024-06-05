@@ -13,7 +13,6 @@ public class ClickablePointGrid extends JFrame {
     private int capacityValue;
     private int sum = 0;
     private Point depot;
-String batool="";
     public ClickablePointGrid() {
         setTitle("Clickable Point Grid");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -66,18 +65,36 @@ String batool="";
             private void drawConnectingLines(Graphics g) {
                 if (points.size() < 2) return;
 
-                // Draw line from depot to the first point
-                Point firstPoint = points.get(0);
-                g.drawLine(depot.x, depot.y, firstPoint.x + 5, firstPoint.y + 5);
 
-                // Draw lines between subsequent points
-                Point prev = firstPoint;
-                for (int i = 1; i < points.size(); i++) {
-                    Point p = points.get(i);
-                    g.drawLine(prev.x + 5, prev.y + 5, p.x + 5, p.y + 5);
-                    prev = p;
+                for (int i=0;i<10;i++) {
+                    if (v[i] == null || v[i].Points.isEmpty()) break;
+
+                    Color vehicleColor = getRandomColor();
+                    g.setColor(vehicleColor);
+                    Point firstPoint = v[i].Points.get(0);
+                    g.drawLine(depot.x, depot.y, firstPoint.x + 5, firstPoint.y + 5);
+
+                    // Draw lines between subsequent points of the vehicle
+                    Point prev = firstPoint;
+                    for (Point p : v[i].Points) {
+                        g.drawLine(prev.x + 5, prev.y + 5, p.x + 5, p.y + 5);
+                        prev = p;
+                    }
+
+                    // Draw line from the last point of the vehicle back to depot
+                    g.drawLine(prev.x + 5, prev.y + 5, depot.x, depot.y);
                 }
             }
+            private Color getRandomColor() {
+                // Generate random values for red, green, and blue components
+                int red = (int) (Math.random() * 256);
+                int green = (int) (Math.random() * 256);
+                int blue = (int) (Math.random() * 256);
+
+                // Create and return the color
+                return new Color(red, green, blue);
+            }
+
         };
 
         JTextField capacityField = new JTextField(10); // Adjust the size as needed
@@ -104,17 +121,23 @@ String batool="";
                         v[i] = new Vehicle(i);
                         v[i].capacity = capacityValue;
                     }
-                    int s = 0;
+                    int currentVehicleIndex = 0; // Index to track the current vehicle
                     for (Point p : points) {
-                        if (sum <= v[s].capacity) {
-                            sum += p.weight;
-                            v[s].addPoint(p);
+                        // If adding the point doesn't exceed the current vehicle's capacity, add it to that vehicle
+                        if (v[currentVehicleIndex].getWeight() + p.weight <= v[currentVehicleIndex].capacity) {
+                            v[currentVehicleIndex].addPoint(p);
                         } else {
-                            sum = p.weight;
-                            s++;
-                            v[s].addPoint(p);
+                            // If adding the point exceeds the capacity, move to the next vehicle
+                            currentVehicleIndex++;
+                            // If there are no more vehicles, exit the loop
+                            if (currentVehicleIndex >= v.length) {
+                                break;
+                            }
+                            // Add the point to the next vehicle
+                            v[currentVehicleIndex].addPoint(p);
                         }
                     }
+
                 } catch (NumberFormatException ex) {
                     System.out.println("Invalid capacity value: " + capacityText);
                     ex.printStackTrace();
