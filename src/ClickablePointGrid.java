@@ -37,7 +37,7 @@ public class ClickablePointGrid extends JFrame {
                 }
                 drawDepot(g);
             }
-            int b;
+
             private void drawDepot(Graphics g) {
                 g.setColor(Color.RED); // Set color for depot point
                 g.fillOval(depot.x - 5, depot.y - 5, 10, 10); // Draw a circle for depot point
