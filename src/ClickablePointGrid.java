@@ -13,7 +13,7 @@ public class ClickablePointGrid extends JFrame {
     private int capacityValue;
     private int sum = 0;
     private Point depot;
-
+String batool="";
     public ClickablePointGrid() {
         setTitle("Clickable Point Grid");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
