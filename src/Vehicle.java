@@ -1,21 +1,29 @@
 import java.util.ArrayList;
-import java.util.List;
 
 public class Vehicle {
-  public int id;
-  public int capacity ;
-  public ArrayList<Point> Points = new ArrayList<>();
-  public Vehicle(int id){
-      this.id=id;
-  }
-  public  void addPoint(Point p){
-      this.Points.add(p);
-  }
+    public int id;
+    public int capacity;
+    public ArrayList<Point> Points;
+
+    public Vehicle(int id) {
+        this.id = id;
+        this.capacity = 0;
+        this.Points = new ArrayList<>();
+    }
+
     public int getWeight() {
         int weight = 0;
         for (Point p : Points) {
             weight += p.weight;
         }
         return weight;
+    }
+
+    public void addPoint(Point point) {
+        this.Points.add(point);
+    }
+
+    public void clearPoints() {
+        this.Points.clear();
     }
 }
