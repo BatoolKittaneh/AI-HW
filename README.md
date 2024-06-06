@@ -24,7 +24,7 @@ You need to develop a tool to solve the VRP.
 
 • Cooling Schedule: Define a cooling schedule for the simulated annealing algorithm.
 
-3. Algorithm Design
+2. Algorithm Design
 
 • Initial Solution: Generate a simple, feasible set of routes randomly.
 
