@@ -16,15 +16,16 @@ public class ClickablePointGrid extends JFrame {
     public ClickablePointGrid() {
         setTitle("Clickable Point Grid");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        getContentPane().setBackground(new Color(95, 158, 160));
         initComponents();
-        setSize(400, 400);
+        getContentPane().setLayout(new FlowLayout());
+        setSize(700, 650); // Set the size of the JFrame to 800x800 pixels
         setVisible(true);
     }
-
     private void initComponents() {
         points = new ArrayList<>();
         convexHull = new Stack<>();
-        depot = new Point(50, 50,0); // Depot coordinates
+        depot = new Point(50, 50, 0); // Depot coordinates
         gridPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -37,6 +38,11 @@ public class ClickablePointGrid extends JFrame {
                 drawDepot(g);
             }
 
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(500, 500); // Set the preferred size of the panel
+            }
+
             private void drawDepot(Graphics g) {
                 g.setColor(Color.RED); // Set color for depot point
                 g.fillOval(depot.x - 5, depot.y - 5, 10, 10); // Draw a circle for depot point
@@ -44,8 +50,8 @@ public class ClickablePointGrid extends JFrame {
             }
 
             private void drawGrid(Graphics g) {
-                int gridSize = 10;
-                g.setColor(Color.LIGHT_GRAY);
+                int gridSize = 20; // Increase the grid size
+                g.setColor(new Color(95, 158, 160)); // Set the color to RGB(95, 158, 160)
                 for (int x = 0; x < getWidth(); x += gridSize) {
                     for (int y = 0; y < getHeight(); y += gridSize) {
                         g.drawRect(x, y, gridSize, gridSize);
@@ -65,8 +71,7 @@ public class ClickablePointGrid extends JFrame {
             private void drawConnectingLines(Graphics g) {
                 if (points.size() < 2) return;
 
-
-                for (int i=0;i<10;i++) {
+                for (int i = 0; i < 10; i++) {
                     if (v[i] == null || v[i].Points.isEmpty()) break;
 
                     Color vehicleColor = getRandomColor();
@@ -85,6 +90,7 @@ public class ClickablePointGrid extends JFrame {
                     g.drawLine(prev.x + 5, prev.y + 5, depot.x, depot.y);
                 }
             }
+
             private Color getRandomColor() {
                 // Generate random values for red, green, and blue components
                 int red = (int) (Math.random() * 256);
@@ -99,11 +105,32 @@ public class ClickablePointGrid extends JFrame {
 
         JTextField capacityField = new JTextField(10); // Adjust the size as needed
         capacityField.setToolTipText("Enter capacity value");
+        Font fieldFont = new Font("Arial", Font.BOLD, 20); // Example: Arial, bold, size 16
+        capacityField.setFont(fieldFont);
 
         JPanel inputPanel = new JPanel();
-        inputPanel.add(new JLabel("Capacity:"));
+        inputPanel.setBackground(new Color(246,182,182));
+        JLabel capacityLabel = new JLabel("Capacity:");
+        inputPanel.add(capacityLabel);
+        Font labelFont = new Font("Arial", Font.BOLD, 20); // Example: Arial, bold, size 16
+       capacityLabel.setFont(labelFont);
         inputPanel.add(capacityField);
         JButton findPathButton = new JButton("Find the Path");
+// Set font for findPathButton
+        Font buttonFont = new Font("Arial", Font.BOLD, 20); // Example: Arial, bold, size 16
+        findPathButton.setFont(buttonFont);
+// Set size for findPathButton
+        findPathButton.setPreferredSize(new Dimension(220, 50)); // Example: width 200, height 50
+// Set background color for findPathButton
+        findPathButton.setBackground(new Color(246,182,182)); // RGB(240, 128, 128)
+
+        JButton optimizePathButton = new JButton("Optimize the Path");
+// Set font for optimizePathButton
+        optimizePathButton.setFont(buttonFont);
+// Set size for optimizePathButton
+        optimizePathButton.setPreferredSize(new Dimension(220, 50)); // Example: width 200, height 50
+// Set background color for optimizePathButton
+        optimizePathButton.setBackground(new Color(246,182,182)); // RGB(240, 128, 128)
         findPathButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -146,7 +173,7 @@ public class ClickablePointGrid extends JFrame {
             }
         });
 
-        JButton optimizePathButton = new JButton("Optimize the Path");
+
         optimizePathButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -155,21 +182,58 @@ public class ClickablePointGrid extends JFrame {
         });
 
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(95, 158, 160));
         buttonPanel.add(findPathButton);
         buttonPanel.add(optimizePathButton);
 
         gridPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                String capacityText = capacityField.getText();
+                if (capacityText.isEmpty()) {
+                    // Capacity not set, prompt user to set capacity first
+                    JOptionPane.showMessageDialog(null, "Please enter the capacity before adding points.", "Capacity Not Set", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                try {
+                    capacityValue = Integer.parseInt(capacityText);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Invalid capacity value: " + capacityText, "Invalid Capacity", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 int x = e.getX();
                 int y = e.getY();
-                int weight = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter weight for this point:", "Point Weight", JOptionPane.PLAIN_MESSAGE));
+                int weight=0;
+                boolean validWeight = false;
+
+                // Keep prompting the user until a valid weight is entered
+                while (!validWeight) {
+                    String weightInput = JOptionPane.showInputDialog(null, "Enter weight for this point:", "Point Weight", JOptionPane.PLAIN_MESSAGE);
+                    if (weightInput == null) {
+                        // User clicked cancel, exit the method
+                        return;
+                    }
+                    try {
+                        weight = Integer.parseInt(weightInput);
+                        if (weight <= capacityValue) {
+                            validWeight = true;
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Weight cannot exceed the capacity (" + capacityValue + "). Please enter a new weight.", "Invalid Weight", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid integer.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
 
                 Point point = new Point(x, y, weight);
                 points.add(point);
                 gridPanel.repaint();
             }
         });
+
+
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(inputPanel, BorderLayout.NORTH);
