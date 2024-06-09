@@ -317,17 +317,28 @@ public class ClickablePointGrid extends JFrame {
 
             // Draw the optimized path with a starting and ending green line segment
             Graphics g = gridPanel.getGraphics();
-            g.setColor(Color.GREEN);
+            Color vehicleColor = getRandomColor(); // Generate a unique color for each vehicle
+            g.setColor(vehicleColor);
             Point firstPoint = path.get(0);
             Point lastPoint = path.get(path.size() - 1);
             g.drawLine(depot.x + 5, depot.y + 5, firstPoint.x + 5, firstPoint.y + 5);
-            drawOptimizedPath(path); // Draw remaining path segments in green
+            drawOptimizedPath(path, vehicleColor); // Draw remaining path segments in the vehicle's color
             g.drawLine(lastPoint.x + 5, lastPoint.y + 5, depot.x + 5, depot.y + 5);
 
             // Print the total distance for each vehicle
             double totalDistance = calculateTotalDistance(path);
             System.out.println("Total shortest distance for Vehicle " + i + ": " + totalDistance);
         }
+    }
+
+    private Color getRandomColor() {
+        // Generate random values for red, green, and blue components
+        int red = (int) (Math.random() * 256);
+        int green = (int) (Math.random() * 256);
+        int blue = (int) (Math.random() * 256);
+
+        // Create and return the color
+        return new Color(red, green, blue);
     }
 
 
@@ -343,9 +354,9 @@ public class ClickablePointGrid extends JFrame {
     }
 
 
-    private void drawOptimizedPath(ArrayList<Point> path) {
+    private void drawOptimizedPath(ArrayList<Point> path, Color color) {
         Graphics g = gridPanel.getGraphics();
-        g.setColor(Color.GREEN);
+        g.setColor(color);
 
         Point prevPoint = path.get(0);
         for (int i = 1; i < path.size(); i++) {
