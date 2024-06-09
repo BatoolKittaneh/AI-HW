@@ -247,29 +247,72 @@ public class ClickablePointGrid extends JFrame {
             return;
         }
 
+        // Clear all previous vehicle routes
+        for (int i = 0; i < v.length; i++) {
+            if (v[i] != null) {
+                v[i].clearPoints();
+            }
+        }
 
+        // Assign points to vehicles based on the current capacity value
+        for (Point p : points) {
+            int currentVehicleIndex = 0;
+            while (currentVehicleIndex < v.length) {
+                if (v[currentVehicleIndex].getWeight() + p.weight <= v[currentVehicleIndex].capacity) {
+                    v[currentVehicleIndex].addPoint(p);
+                    break;
+                } else {
+                    currentVehicleIndex++;
+                }
+            }
+            if (currentVehicleIndex >= v.length) {
+                System.out.println("Not enough capacity to assign all points.");
+                return;
+            }
+        }
+
+        // Recalculate shortest path for each vehicle
+        for (int i = 0; i < v.length; i++) {
+            if (v[i].Points.isEmpty()) {
+                continue; // Skip vehicles with no assigned points
+            }
+
+            ArrayList<Point> path = new ArrayList<>();
+            boolean[] visited = new boolean[v[i].Points.size()];
+
+            // Start and end at the depot
+            path.add(depot); // Start at the depot
+            visited[0] = true;
+
+            // Calculate the shortest path using a greedy algorithm
+            for (int j = 0; j < v[i].Points.size(); j++) {
+                Point currentPoint = path.get(path.size() - 1); // Get the last point added to the path
+                double shortestDistance = Double.MAX_VALUE;
+                int nextIndex = -1;
+
+                // Find the closest unvisited point
+                for (int k = 0; k < v[i].Points.size(); k++) {
+                    if (!visited[k]) {
+                        double distance = calculateDistance(currentPoint, v[i].Points.get(k));
+                        if (distance < shortestDistance) {
+                            shortestDistance = distance;
+                            nextIndex = k;
+                        }
                     }
                 }
 
-                // Update current point and path
-                if (nextPoint != null) {
+                // Add the closest unvisited point to the path
+                if (nextIndex != -1) {
+                    path.add(v[i].Points.get(nextIndex));
                     visited[nextIndex] = true;
-                    path.add(nextPoint);
-                    currentPointIndex = nextIndex;
                 }
             }
 
+            // Ensure the path ends at the depot
+            path.add(depot);
 
-            }
-
-            // Draw the optimized path with a starting and ending green line segment
-            Graphics g = gridPanel.getGraphics();
-            g.setColor(Color.GREEN);
-            Point firstPoint = path.get(0);
-            Point lastPoint = path.get(path.size() - 1);
-            g.drawLine(depot.x + 5, depot.y + 5, firstPoint.x + 5, firstPoint.y + 5);
-            drawOptimizedPath(path); // Draw remaining path segments in green
-            g.drawLine(lastPoint.x + 5, lastPoint.y + 5, depot.x + 5, depot.y + 5);
+            // Draw the optimized path
+            drawOptimizedPath(path, getRandomColor());
 
             // Print the total distance for each vehicle
             double totalDistance = calculateTotalDistance(path);
@@ -278,10 +321,32 @@ public class ClickablePointGrid extends JFrame {
     }
 
 
+    private Color getRandomColor() {
+        // Generate random values for red, green, and blue components
+        int red = (int) (Math.random() * 256);
+        int green = (int) (Math.random() * 256);
+        int blue = (int) (Math.random() * 256);
 
-    private void drawOptimizedPath(ArrayList<Point> path) {
+        // Create and return the color
+        return new Color(red, green, blue);
+    }
+
+
+
+
+
+    private double calculateTotalDistance(ArrayList<Point> path) {
+        double totalDistance = 0;
+        for (int i = 0; i < path.size() - 1; i++) {
+            totalDistance += calculateDistance(path.get(i), path.get(i + 1));
+        }
+        return totalDistance;
+    }
+
+
+    private void drawOptimizedPath(ArrayList<Point> path, Color color) {
         Graphics g = gridPanel.getGraphics();
-        g.setColor(Color.GREEN);
+        g.setColor(color);
 
         Point prevPoint = path.get(0);
         for (int i = 1; i < path.size(); i++) {
